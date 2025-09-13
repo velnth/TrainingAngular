@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ProductService } from '../../Service/product.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { first } from 'rxjs/operators';
@@ -7,20 +6,18 @@ import { CategoryProductService } from '../../Service/category-product.service';
 
 
 @Component({
-  selector: 'app-product-form',
+  selector: 'app-category-form',
   standalone: false,
-  templateUrl: './product-form.html',
-  styleUrl: './product-form.css'
+  templateUrl: './category-form.html',
+  styleUrl: './category-form.css'
 })
-export class ProductForm {
+export class CategoryForm {
   loading = false;
   submitted = false;
   form!: FormGroup;
   id!: string;
-  categories: any[] = [];
   isAddMode!: boolean;
   constructor(
-    private productService: ProductService,
     private CategoryService: CategoryProductService,
     private router: Router,
     private route: ActivatedRoute,
@@ -31,16 +28,12 @@ export class ProductForm {
     this.id = this.route.snapshot.params['id'];
     this.isAddMode = !this.id;
     this.form = this.formBuilder.group({
-      PRODUCT_CODE: ['',],
-      PRODUCT_NAME: ['', [Validators.required]],
-      CATEGORY: ['', [Validators.required]],
-      PRICE: ['', [Validators.required, Validators.min(0)]],
+      CATEGORY_CODE: ['',],
+      CATEGORY_NAME: ['', [Validators.required]],
     })
 
-    this.getCategories();
-
     if (!this.isAddMode) {
-      this.productService.getById(this.id)
+      this.CategoryService.getById(this.id)
         .pipe(first())
         .subscribe(x => {
           console.log(x);
@@ -48,21 +41,8 @@ export class ProductForm {
         })
     }
   }
-  get f() { return this.form.controls; }
 
-  private getCategories(): void {
-    this.CategoryService.getAll()
-      .pipe(first())
-      .subscribe({
-        next: (data) => {
-          this.categories = data; // Simpan data kategori ke variabel `categories`
-        },
-        error: (err) => {
-          alert('Gagal mengambil data kategori.');
-          console.error(err);
-        }
-      });
-  }
+  get f() { return this.form.controls; }
 
   onSubmit(): void {
     this.submitted = true;
@@ -80,12 +60,12 @@ export class ProductForm {
   }
 
   private createData(): void {
-    this.productService.createData(this.form.value)
+    this.CategoryService.createData(this.form.value)
       .pipe(first())
       .subscribe({
         next: () => {
           alert('Data Created Successfully.');
-          this.router.navigate(['/products']);
+          this.router.navigate(['/category']);
         },
         error: err => {
           alert('Error: ' + err);
@@ -96,11 +76,11 @@ export class ProductForm {
   }
 
   private updateData(): void {
-    this.productService.updateData(this.id, this.form.value)
+    this.CategoryService.updateData(this.id, this.form.value)
       .pipe(first()).subscribe({
         next: () => {
           alert('Data Updated Successfully.');
-          this.router.navigate(['/products'])
+          this.router.navigate(['/category'])
         },
         error: err => {
           alert('Error: ' + err);

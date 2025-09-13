@@ -1,29 +1,53 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faPlus, faPencil } from '@fortawesome/free-solid-svg-icons';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPencil } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '../Service/product.service';
+import { first } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-product',
-  standalone: true,
-  imports: [CommonModule, FontAwesomeModule],
+  selector: 'app-products',
+  standalone: false,
   templateUrl: './product.html',
   styleUrl: './product.css'
 })
 export class Product {
   faPlus = faPlus;
   faPencil = faPencil;
+  fatrash = faTrash;
   products: any[] = [];
-  constructor(
-    private produkService: ProductService
-  ){ }
-  ngOnInit():void {
-    this.produkService.getAll().subscribe({
-      next: (data)=> this.products = data,
-      error: (err) => console.error('Error loading products', err)
+  router: any;
+  constructor(private productService: ProductService,
+    private cdr: ChangeDetectorRef // biar ke load
+  ) { }
+
+  ngOnInit(): void {
+    this.productService.getAll().subscribe(data => {
+      this.products = data;
+      this.cdr.detectChanges(); // biar ke load productnya
+      console.log(this.products);
     });
   }
+
+  deleteData(id: string): void {
+    if (confirm('Are you sure to DELETE THIS DATA?')) {
+      this.productService.deleteData(id).pipe(first()).subscribe({
+        next: () => {
+          alert('Data Deleted Successfully.');
+          this.router.navigate(['/products'])
+        },
+        error: err => {
+          if (err.status === 204) {
+            alert('Data Deleted Successfully.');
+            this.ngOnInit();
+          } else {
+            alert('Error: angular kintil');
+            console.error('Error details:', err);
+          }
+        }
+      })
+    }
+  }
+
 
   // products = [
   //   { code: 'P001', name: 'Laptop Pro 14"', category: 'Elektronik', price: 15000000, stock: 12 },
@@ -32,4 +56,5 @@ export class Product {
   //   { code: 'P004', name: 'Meja Kerja Kayu', category: 'Furniture', price: 2400000, stock: 14 },
   //   { code: 'P005', name: 'Mouse Wireless', category: 'Aksesoris', price: 250000, stock: 50 }
   // ];
+
 }
