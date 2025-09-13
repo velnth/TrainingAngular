@@ -1,0 +1,29 @@
+<!-- {{  }} Intepolation: sintaks ini digunakan untuk menampilkan nilai properti dari komponen ts ke dalam html -->
+<h1>{{ JudulHalaman }}</h1>
+<p>{{ subJudul }}</p>
+
+<!-- ini disebut dgn event binding, event binding adalah sintaks untuk mengikat (bind) -->
+ <!-- setiap tombol di klik maka akan memanggil fungsi tambahKlik() -->
+  <!-- dan akan menambah nilai properti jumlahKlik -->
+<button (click)="tambahKlik()">Klik saya</button>
+<p>Jumlah Klik: {{ jumlahKlik }}</p>
+
+<button [disabled]="!apakahtombolAktif">TOmbol Ini aktif</button>
+<p [class.aktif]="apakahtombolAktif" [class.nonaktif]="!apakahtombolAktif">Status Tombol</p>
+
+<hr>
+
+<h3>Daftar Pengguna:</h3>
+<ul>
+    <li *ngFor="let nama of daftarNama; let i = index;">
+        {{ i + 1 }}. {{ sapaPengguna(nama) }}
+        <button (click)="hapusNama(i)">Hapus</button>
+    </li>
+</ul>
+
+<hr>
+
+<p>
+    <strong>Detail Pengguna:</strong>
+    Nama: {{ dataPengguna.nama }}, Usia: {{ dataPengguna.umur }} tahun
+</p>
